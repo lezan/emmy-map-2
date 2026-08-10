@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Carte interactive de la zone du projet Emmy Map 2.">
+    <title>Emmy Map 2</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <style>
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .leaflet-control-layers,
+      .leaflet-popup-content-wrapper {
+        border-radius: 6px;
+      }
+
+      .map-title,
+      .opacity-control,
+      .error-message {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 6px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        color: #1f2933;
+      }
+
+      .map-title {
+        line-height: 1.25;
+        padding: 10px 12px;
+      }
+
+      .map-title strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .map-title span {
+        color: #52606d;
+        display: block;
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .opacity-control {
+        padding: 9px 10px 10px;
+        width: 180px;
+      }
+
+      .opacity-control label {
+        display: flex;
+        font-size: 12px;
+        font-weight: 600;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      .opacity-control input {
+        display: block;
+        width: 100%;
+      }
+
+      .error-message {
+        color: #991b1b;
+        font-size: 13px;
+        margin: 10px;
+        padding: 10px 12px;
+      }
+
+      .massif-label {
+        background: rgba(255, 255, 255, 0.9);
+        border: 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.24);
+        color: #3f2d20;
+        font-size: 11px;
+        font-weight: 650;
+        padding: 3px 6px;
+        white-space: nowrap;
+      }
+
+      .massif-label::before {
+        display: none;
+      }
+
+      .popup-table {
+        border-collapse: collapse;
+        min-width: 160px;
+      }
+
+      .popup-table th,
+      .popup-table td {
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 12px;
+        padding: 4px 0;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .popup-table th {
+        color: #52606d;
+        font-weight: 600;
+        padding-right: 12px;
+      }
+
+      @media (max-width: 520px) {
+        .opacity-control {
+          width: 150px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" role="application" aria-label="Carte interactive de la zone du projet Emmy Map 2"></div>
+
+    <script src="vendor/leaflet/leaflet.js"></script>
+    <script>
+      const map = L.map("map", { preferCanvas: true, zoomControl: true });
+
+      const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      const topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+        maxZoom: 17,
+        attribution: 'Données cartographiques : &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, SRTM | Style : &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
+      });
+
+      const baseLayers = {
+        OpenStreetMap: osm,
+        OpenTopoMap: topo,
+      };
+
+      const styles = {
+        area: {
+          color: "#78350f",
+          weight: 2,
+          opacity: 0.95,
+          fillColor: "#facc15",
+          fillOpacity: 0.16,
+        },
+      };
+
+      let activeBaseLayer = osm;
+      let baseOpacity = 1;
+
+      const title = L.control({ position: "topleft" });
+      title.onAdd = function () {
+        const element = L.DomUtil.create("div", "map-title");
+        element.innerHTML = "<strong>Emmy Map 2</strong><span>Données thématiques sur fond OSM</span>";
+        return element;
+      };
+      title.addTo(map);
+
+      const opacityControl = L.control({ position: "bottomleft" });
+      opacityControl.onAdd = function () {
+        const element = L.DomUtil.create("div", "opacity-control");
+        element.innerHTML = `
+          <label for="base-opacity">
+            <span>Opacité du fond</span>
+            <span id="base-opacity-value">100%</span>
+          </label>
+          <input id="base-opacity" type="range" min="0" max="1" step="0.05" value="1">
+        `;
+
+        L.DomEvent.disableClickPropagation(element);
+        L.DomEvent.disableScrollPropagation(element);
+
+        const input = element.querySelector("#base-opacity");
+        const value = element.querySelector("#base-opacity-value");
+        input.addEventListener("input", () => {
+          baseOpacity = Number(input.value);
+          activeBaseLayer.setOpacity(baseOpacity);
+          value.textContent = `${Math.round(baseOpacity * 100)}%`;
+        });
+
+        return element;
+      };
+      opacityControl.addTo(map);
+
+      map.on("baselayerchange", (event) => {
+        activeBaseLayer = event.layer;
+        activeBaseLayer.setOpacity(baseOpacity);
+      });
+
+      function showError(message) {
+        const errorControl = L.control({ position: "topright" });
+        errorControl.onAdd = function () {
+          const element = L.DomUtil.create("div", "error-message");
+          element.textContent = message;
+          return element;
+        };
+        errorControl.addTo(map);
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function massifPopup(properties) {
+        const entries = [
+          ["Nom", properties.name],
+          ["Massif", properties.range],
+        ].filter(([, value]) => value !== null && value !== undefined && value !== "");
+
+        if (!entries.length) {
+          return "";
+        }
+
+        const rows = entries
+          .map(([label, value]) => `<tr><th>${label}</th><td>${escapeHtml(value)}</td></tr>`)
+          .join("");
+        return `<table class="popup-table">${rows}</table>`;
+      }
+
+      function layerOptions(layerInfo) {
+        return {
+          style: () => styles[layerInfo.id] || { color: "#111827", weight: 2, opacity: 0.8 },
+          pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+            radius: 5,
+            color: "#3f2d20",
+            fillColor: "#f59e0b",
+            fillOpacity: 0.95,
+            weight: 1.5,
+          }),
+          onEachFeature: (feature, featureLayer) => {
+            if (layerInfo.id !== "massif") {
+              return;
+            }
+
+            const properties = feature.properties || {};
+            const popup = massifPopup(properties);
+            if (popup) {
+              featureLayer.bindPopup(popup);
+            }
+
+            if (properties.range) {
+              featureLayer.bindTooltip(String(properties.range), {
+                className: "massif-label",
+                direction: "top",
+                offset: [0, -5],
+                permanent: true,
+              });
+            }
+          },
+        };
+      }
+
+      async function loadLayer(layerInfo) {
+        const response = await fetch(layerInfo.url);
+        if (!response.ok) {
+          throw new Error(`Impossible de charger ${layerInfo.url}.`);
+        }
+
+        const data = await response.json();
+        return L.geoJSON(data, layerOptions(layerInfo));
+      }
+
+      async function init() {
+        const response = await fetch("data/manifest.json");
+        if (!response.ok) {
+          throw new Error("Impossible de charger le manifeste des couches.");
+        }
+
+        const manifest = await response.json();
+        const entries = await Promise.all(
+          manifest.map(async (layerInfo) => [layerInfo, await loadLayer(layerInfo)]),
+        );
+
+        entries.forEach(([, layer]) => layer.addTo(map));
+
+        const layersById = Object.fromEntries(
+          entries.map(([layerInfo, layer]) => [layerInfo.id, layer]),
+        );
+        const overlays = Object.fromEntries(
+          entries.map(([layerInfo, layer]) => [
+            `${layerInfo.label} (${layerInfo.featureCount})`,
+            layer,
+          ]),
+        );
+
+        L.control.layers(baseLayers, overlays, {
+          collapsed: window.matchMedia("(max-width: 720px)").matches,
+        }).addTo(map);
+
+        const areaBounds = layersById.area?.getBounds();
+        if (!areaBounds?.isValid()) {
+          throw new Error("La zone du projet ne contient aucune géométrie valide.");
+        }
+
+        map.fitBounds(areaBounds.pad(0.08));
+      }
+
+      init().catch((error) => {
+        console.error(error);
+        map.setView([42.65, 0.9], 8);
+        showError("Les données de la carte n’ont pas pu être chargées.");
+      });
+    </script>
+  </body>
+</html>

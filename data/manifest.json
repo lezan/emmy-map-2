@@ -1,0 +1,14 @@
+[
+  {
+    "id": "area",
+    "label": "Zone du projet",
+    "url": "data/area.geojson",
+    "featureCount": 1
+  },
+  {
+    "id": "massif",
+    "label": "Massifs",
+    "url": "data/massif.geojson",
+    "featureCount": 11
+  }
+]

@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "area",
+"xy_coordinate_resolution": 1e-06,
+"features": [
+{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[0.319351,42.288098],[1.532666,42.312159],[1.513258,42.98726],[0.28943,42.962743],[0.319351,42.288098]]]}}
+]
+}

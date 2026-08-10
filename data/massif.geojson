@@ -1,0 +1,18 @@
+{
+"type": "FeatureCollection",
+"name": "massif",
+"xy_coordinate_resolution": 1e-06,
+"features": [
+{"type":"Feature","properties":{"name":"Aneto","range":"Massif de la Maladeta"},"geometry":{"type":"Point","coordinates":[0.656646,42.631066]}},
+{"type":"Feature","properties":{"name":"Pic du Balaïtous","range":"Massif du Balaïtous"},"geometry":{"type":"Point","coordinates":[-0.29026,42.838938]}},
+{"type":"Feature","properties":{"name":"Pic Schrader","range":"Massif de Batchimale"},"geometry":{"type":"Point","coordinates":[0.394424,42.698596]}},
+{"type":"Feature","properties":{"name":"Comaloforno","range":"Besiberri Massif"},"geometry":{"type":"Point","coordinates":[0.827832,42.59138]}},
+{"type":"Feature","properties":{"name":"Mont Perdu","range":"Massif du Mont-Perdu"},"geometry":{"type":"Point","coordinates":[0.034357,42.675548]}},
+{"type":"Feature","properties":{"name":"Pic Long","range":"Massif du Néouvielle"},"geometry":{"type":"Point","coordinates":[0.100127,42.800823]}},
+{"type":"Feature","properties":{"name":"Pic Perdiguère","range":"Massif de Perdiguère"},"geometry":{"type":"Point","coordinates":[0.518865,42.692]}},
+{"type":"Feature","properties":{"name":"Posets","range":"Massif des Posets"},"geometry":{"type":"Point","coordinates":[0.435227,42.654628]}},
+{"type":"Feature","properties":{"name":"Pic de la Munia","range":"Massif de la Munia"},"geometry":{"type":"Point","coordinates":[0.131912,42.714886]}},
+{"type":"Feature","properties":{"name":"Pique Longue","range":"Massif du Vignemale"},"geometry":{"type":"Point","coordinates":[-0.147343,42.773942]}},
+{"type":"Feature","properties":{"name":"Pique d'Estats","range":"Massif du Montcalm"},"geometry":{"type":"Point","coordinates":[1.397898,42.666951]}}
+]
+}
