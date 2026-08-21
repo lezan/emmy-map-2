@@ -3,13 +3,15 @@
 Mappa web statica pronta per GitHub Pages, realizzata con Leaflet e fondi
 OpenStreetMap/OpenTopoMap.
 
-La webapp pubblica i layer `area` e `massif`. Il file `data/manifest.json`
-definisce ordine, etichette francesi, URL e conteggio delle feature.
+La webapp pubblica i layer `area`, `massif`, `border` e `hut`. Il file
+`data/manifest.json` definisce ordine, etichette francesi, URL e conteggio
+delle feature.
 
 I GeoJSON usano coordinate geografiche CRS84 (longitudine, latitudine),
 compatibili con Leaflet. La vista iniziale è centrata sul perimetro di
 `area.geojson`; i punti di `massif.geojson` mostrano etichette permanenti
-derivate dal campo `range`.
+derivate dal campo `range`. I rifugi usano il simbolo SVG condiviso con Emmy
+Map 1.
 
 ## Provare la mappa in locale
 

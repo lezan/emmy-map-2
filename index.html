@@ -147,6 +147,21 @@
           fillColor: "#facc15",
           fillOpacity: 0.16,
         },
+        border: {
+          color: "#111827",
+          weight: 3,
+          opacity: 0.9,
+          dashArray: "8 5",
+        },
+      };
+
+      const svgIcons = {
+        hut: L.icon({
+          iconUrl: "assets/icons/hut.svg",
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+          popupAnchor: [0, -8],
+        }),
       };
 
       let activeBaseLayer = osm;
@@ -210,7 +225,7 @@
           .replaceAll("'", "&#039;");
       }
 
-      function massifPopup(properties) {
+      function featurePopup(properties) {
         const entries = [
           ["Nom", properties.name],
           ["Massif", properties.range],
@@ -229,25 +244,27 @@
       function layerOptions(layerInfo) {
         return {
           style: () => styles[layerInfo.id] || { color: "#111827", weight: 2, opacity: 0.8 },
-          pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-            radius: 5,
-            color: "#3f2d20",
-            fillColor: "#f59e0b",
-            fillOpacity: 0.95,
-            weight: 1.5,
-          }),
-          onEachFeature: (feature, featureLayer) => {
-            if (layerInfo.id !== "massif") {
-              return;
+          pointToLayer: (feature, latlng) => {
+            if (svgIcons[layerInfo.id]) {
+              return L.marker(latlng, { icon: svgIcons[layerInfo.id] });
             }
 
+            return L.circleMarker(latlng, {
+              radius: 5,
+              color: "#3f2d20",
+              fillColor: "#f59e0b",
+              fillOpacity: 0.95,
+              weight: 1.5,
+            });
+          },
+          onEachFeature: (feature, featureLayer) => {
             const properties = feature.properties || {};
-            const popup = massifPopup(properties);
+            const popup = featurePopup(properties);
             if (popup) {
               featureLayer.bindPopup(popup);
             }
 
-            if (properties.range) {
+            if (layerInfo.id === "massif" && properties.range) {
               featureLayer.bindTooltip(String(properties.range), {
                 className: "massif-label",
                 direction: "top",

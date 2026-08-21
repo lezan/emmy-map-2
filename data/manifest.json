@@ -10,5 +10,17 @@
     "label": "Massifs",
     "url": "data/massif.geojson",
     "featureCount": 11
+  },
+  {
+    "id": "border",
+    "label": "Frontière",
+    "url": "data/border.geojson",
+    "featureCount": 1
+  },
+  {
+    "id": "hut",
+    "label": "Refuges",
+    "url": "data/hut.geojson",
+    "featureCount": 40
   }
 ]
